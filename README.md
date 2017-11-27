@@ -10,8 +10,8 @@ and also, all the correspondent pubblications for the dataset included:
 
     - MIT1003: http://people.csail.mit.edu/tjudd/WherePeopleLook/Docs/wherepeoplelook.pdf
     - TORONTO: http://journalofvision.org/7/9/950/
-    - KOOTSTRA: http://www.csc.kth.se/~kootstra/index.php?item=602&menu=&file=http://dx.doi.org/10.1007/s12559-010-9089-5
-
+    - KOOTSTRA: http://www.csc.kth.se/~kootstra/index.php?item=215&menu=200
+    
 ## Download FixaTons
 
 - Clone or download the folder with the code

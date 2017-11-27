@@ -4,13 +4,18 @@ A collection of Human FixationsDatasets and Metrics for Scanpath Similarity
 ## Citations
 If you intend to use this collection of dataset for your research, please cite the technical report
 
-    - FixaTons technical report: link
+- FixaTons technical report: link
 
 and also, all the correspondent pubblications for the dataset included:
 
-    - MIT1003: http://people.csail.mit.edu/tjudd/WherePeopleLook/Docs/wherepeoplelook.pdf
-    - TORONTO: http://journalofvision.org/7/9/950/
-    - KOOTSTRA: http://www.csc.kth.se/~kootstra/index.php?item=215&menu=200
+
+- MIT1003: http://people.csail.mit.edu/tjudd/WherePeopleLook/Docs/wherepeoplelook.pdf
+
+- TORONTO: http://journalofvision.org/7/9/950/
+
+- KOOTSTRA: http://www.csc.kth.se/~kootstra/index.php?item=215&menu=200
+
+
     
 ## Download FixaTons
 

@@ -1,16 +1,6 @@
 # FixaTons
 A collection of Human FixationsDatasets and Metrics for Scanpath Similarity
 
-For an easy use of the dataset, python software is provided. This tools help you in different tasks:
-
-    - List information
-    - Get data (matrices)
-    - Visualize data
-    - Compute metrics
-    - Compute statistics
-
-See the correspondent report or the Tutorial.ipynb to an introduction. 
-
 ## Download FixaTons
 
 - Clone or download the folder with the code
@@ -46,4 +36,17 @@ ________________________________________________________________________________
             format (jpg, jpeg, png,...)
             
 ________________________________________________________________________________
+
+## How to use FixaTons (with python)
+
+
+For an easy use of the dataset, python software is provided. This tools help you in different tasks:
+
+    - List information
+    - Get data (matrices)
+    - Visualize data
+    - Compute metrics
+    - Compute statistics
+
+For some example codes, please refer to the correspondent report or Tutorial.ipynb (jupiter notebook).
 

@@ -61,5 +61,5 @@ For an easy use of the dataset, python software is provided. This tools help you
     - Compute metrics
     - Compute statistics
 
-For some example codes, please refer to the correspondent report or Tutorial.ipynb (jupiter notebook).
+For some example codes, please refer to the correspondent report or Tutorial.ipynb (jupiter notebook) https://github.com/dariozanca/FixaTons/blob/master/Tutorial.ipynb.
 

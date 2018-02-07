@@ -4,7 +4,7 @@ A collection of Human FixationsDatasets and Metrics for Scanpath Similarity
 ## Citations
 If you intend to use this collection of datasets on your research, please cite the technical report
 
-- FixaTons technical report: LINK
+- FixaTons technical report: https://drive.google.com/open?id=1TQSaq5J0p_oCdkyVZ-IzBltLwJ2cm3UA
 
 and also, all the correspondent pubblications for the dataset included:
 

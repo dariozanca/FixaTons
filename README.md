@@ -11,6 +11,8 @@ and also, all the correspondent pubblications for the dataset included:
 
 - MIT1003: http://people.csail.mit.edu/tjudd/WherePeopleLook/Docs/wherepeoplelook.pdf
 
+ Authors of compatible datasets are encouraged to add them to this collection. Simply send an email to the corresponding author of this report along with an authorization to redistribute that data. Below, the list of datasets currently added to the collection.
+
     
 ## Download FixaTons
 

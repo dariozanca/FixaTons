@@ -17,7 +17,7 @@ and also, all the correspondent pubblications for the dataset included:
 ## Download FixaTons
 
 - Clone or download the folder with the code
-- Download the zip file from https://drive.google.com/open?id=1TQSaq5J0p_oCdkyVZ-IzBltLwJ2cm3UA and extract its content in the same folder with the code
+- Download the zip file from https://drive.google.com/file/d/16i3GItnUAkWfATGFDF5qCqJbZFTCyWHA/ and extract its content in the same folder with the code
 
 ## Structure of FixaTons
 

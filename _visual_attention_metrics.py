@@ -170,7 +170,7 @@ def NSS(saliencyMap, fixationMap):
     # If there are no fixations to predict, return NaN
     if not fixationMap.any():
         print('Error: no fixationMap')
-        score = nan
+        score = float('nan')
         return score
 
     # make sure maps have the same shape
@@ -212,7 +212,7 @@ def euclidean_distance(human_scanpath, simulated_scanpath):
 
     else:
 
-        print 'Error: The two sequences must have the same length!'
+        print('Error: The two sequences must have the same length!')
         return False
 
 
@@ -309,7 +309,7 @@ def string_edit_distance(stimulus, # matrix
     string_1 = _scanpath_to_string(human_scanpath, height, width, n)
     string_2 = _scanpath_to_string(simulated_scanpath, height, width, n)
 
-    print string_1, string_2
+    print(string_1, string_2)
 
     return _Levenshtein(string_1, string_2)
 
@@ -340,7 +340,7 @@ def time_delay_embedding_distance(
 
     # we check for k be smaller or equal then the lenghts of the two input scanpaths
     if len(human_scanpath) < k or len(simulated_scanpath) < k:
-        print 'ERROR: Too large value for the time-embedding vector dimension'
+        print('ERROR: Too large value for the time-embedding vector dimension')
         return False
 
     # create time-embedding vectors for both scanpaths
@@ -381,7 +381,7 @@ def time_delay_embedding_distance(
     elif distance_mode == 'Hausdorff':
         return max(distances)
     else:
-        print 'ERROR: distance mode not defined.'
+        print('ERROR: distance mode not defined.')
         return False
 
 
@@ -418,7 +418,7 @@ def scaled_time_delay_embedding_distance(
             k=k,  # time-embedding vector dimension
             distance_mode='Mean')
         similarities.append(np.exp(-s))
-        print similarities[-1]
+        print(similarities[-1])
 
     # Now that we have similarity measure for all possible k
     # we compute and return the mean

@@ -10,8 +10,7 @@
 
 #########################################################################################
 
-import os
-COLLECTION_PATH = os.path.dirname(os.path.abspath(__file__)) + '/FixaTons'
+from FixaTons import COLLECTION_PATH
 
 #########################################################################################
 
@@ -33,9 +32,13 @@ def stimulus(DATASET_NAME, STIMULUS_NAME):
 
         The returned matrix could be 2- or 3-dimesional. '''
 
-    return cv2.imread(COLLECTION_PATH+'/'
-                      +DATASET_NAME+'/STIMULI/'
-                      +STIMULUS_NAME, 1)
+    return cv2.imread(
+        os.path.join(
+            COLLECTION_PATH,
+            DATASET_NAME,
+            'STIMULI',
+            STIMULUS_NAME
+        ), 1)
 
 #########################################################################################
 
@@ -58,18 +61,24 @@ def fixation_map(DATASET_NAME, STIMULUS_NAME):
 
     _, file_extension = os.path.splitext(
         os.listdir(
-            COLLECTION_PATH + '/'
-            + DATASET_NAME + '/FIXATION_MAPS/')[0])
+            os.path.join(
+                COLLECTION_PATH,
+                DATASET_NAME,
+                'FIXATION_MAPS')
+        )[0])
 
     # Get the matrix
 
-    fixation_map = cv2.imread(  COLLECTION_PATH+'/'
-                                +DATASET_NAME+'/FIXATION_MAPS/'
-                                +file_name+file_extension, 1)
+    fixation_map = cv2.imread(
+        os.path.join(COLLECTION_PATH,
+                     DATASET_NAME,
+                     'FIXATION_MAPS',
+                     file_name+file_extension
+                     ), 1)
 
-    fixation_map = fixation_map[:,:,0]
+    fixation_map = fixation_map[:, :, 0]
 
-    fixation_map[fixation_map>0] = 1
+    fixation_map[fixation_map > 0] = 1
 
     return fixation_map
 
@@ -96,15 +105,21 @@ def saliency_map(DATASET_NAME, STIMULUS_NAME):
 
     _, file_extension = os.path.splitext(
                             os.listdir(
-                                COLLECTION_PATH+'/'
-                                +DATASET_NAME+'/SALIENCY_MAPS/')[0] )
+                                os.path.join(
+                                    COLLECTION_PATH,
+                                    DATASET_NAME,
+                                    'SALIENCY_MAPS')
+                            )[0]
+    )
 
     # Get the matrix
-    saliency_map = cv2.imread(  COLLECTION_PATH+'/'
-                                +DATASET_NAME+'/SALIENCY_MAPS/'
-                                +file_name+file_extension, 0)
-
-    return saliency_map
+    return cv2.imread(
+        os.path.join(
+            COLLECTION_PATH,
+            DATASET_NAME,
+            'SALIENCY_MAPS',
+            file_name + file_extension
+        ), 0)
 
 #########################################################################################
 
@@ -123,19 +138,26 @@ def scanpath(DATASET_NAME, STIMULUS_NAME,
     file_name, _ = os.path.splitext(STIMULUS_NAME)
 
     if not subject:
-        list_of_subjects = os.listdir(COLLECTION_PATH+'/'
-                            +DATASET_NAME+'/SCANPATHS/'
-                            +file_name)
+        list_of_subjects = os.listdir(
+            os.path.join(
+                COLLECTION_PATH,
+                DATASET_NAME,
+                'SCANPATHS',
+                file_name)
+        )
         subject = random.choice(list_of_subjects)
 
-    scanpath_file = open(   COLLECTION_PATH+'/'
-                            +DATASET_NAME+'/SCANPATHS/'
-                            +file_name+'/'
-                            +subject, 'r')
+    scanpath_file = open(
+        os.path.join(
+            COLLECTION_PATH,
+            DATASET_NAME,
+            'SCANPATHS',
+            file_name,
+            subject), 'r')
 
     scanpath_file_lines = scanpath_file.readlines()
 
-    scanpath = np.zeros((len(scanpath_file_lines),4))
+    scanpath = np.zeros((len(scanpath_file_lines), 4))
 
     for i in range(len(scanpath)):
         scanpath[i] = np.array(scanpath_file_lines[i].split()).astype(np.float)

@@ -1,8 +1,8 @@
 '''
-@author: Dario Zanca, Ph.D. Student in Smart Computing
-@institutions: University of Florence, University of Siena
+@author: Dario Zanca, Ph.D.
+@institutions: University of Siena
 
-@e-mail: dario.zanca@unifi.it
+@e-mail: dariozanca@gmail.it
 @tel: (+39) 333 82 78 072
 
 @date: October, 2017
@@ -13,12 +13,11 @@
 # IMPORT EXTERNAL LIBRARIES
 
 import FixaTons
-import os
 import numpy as np
 
 #########################################################################################
 
-COLLECTION_PATH = os.path.dirname(os.path.abspath(__file__)) + '/FixaTons'
+from FixaTons import COLLECTION_PATH
 
 #########################################################################################
 
@@ -36,11 +35,11 @@ def statistics(DATASET_NAME=None):
     if DATASET_NAME:
         datasets_list = (DATASET_NAME,)
     else:
-        datasets_list = FixaTons.list.datasets()
+        datasets_list = FixaTons.info.datasets()
 
     for DATASET_NAME in datasets_list:
-        for STIMULUS_NAME in FixaTons.list.stimuli(DATASET_NAME):
-            for SUBJECT_NAME in FixaTons.list.subjects(DATASET_NAME, STIMULUS_NAME):
+        for STIMULUS_NAME in FixaTons.info.stimuli(DATASET_NAME):
+            for SUBJECT_NAME in FixaTons.info.subjects(DATASET_NAME, STIMULUS_NAME):
 
                 number_of_scanpaths += 1
 
@@ -64,7 +63,7 @@ def fps(scanpath):
     if len(scanpath) == 0:
         return 0
     else:
-        return float(len(scanpath))/scanpath[-1,3]
+        return float(len(scanpath))/scanpath[-1, 3]
 
 def sac_len(scanpath):
 
@@ -72,13 +71,13 @@ def sac_len(scanpath):
         return 0
     else:
 
-        sum = 0
+        s = 0
 
-        for i in np.arange(1,len(scanpath), 1):
+        for i in np.arange(1, len(scanpath), 1):
 
-            sum += np.sqrt(
-                        (scanpath[i, 0] - scanpath[i-1, 0])**2 +
+            s += np.sqrt(
+                        (scanpath[i, 0] - scanpath[i-1, 0]) ** 2 +
                         (scanpath[i, 1] - scanpath[i - 1, 1]) ** 2
             )
 
-        return sum / len(scanpath)
+        return s / len(scanpath)

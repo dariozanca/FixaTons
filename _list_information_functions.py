@@ -1,11 +1,11 @@
 '''
-@author: Dario Zanca, Ph.D. Student in Smart Computing
-@institutions: University of Florence, University of Siena
+@author: Dario Zanca, Ph.D.
+@institutions: University of Siena
 
-@e-mail: dario.zanca@unifi.it
+@e-mail: dariozanca@gmail.it
 @tel: (+39) 333 82 78 072
 
-@date: September, 2017
+@date: October, 2017
 '''
 
 #########################################################################################
@@ -16,7 +16,7 @@ import os
 
 #########################################################################################
 
-COLLECTION_PATH = os.path.dirname(os.path.abspath(__file__)) + '/FixaTons'
+from FixaTons import COLLECTION_PATH
 
 #########################################################################################
 
@@ -43,4 +43,11 @@ def subjects(DATASET_NAME, STIMULUS_NAME):
 
     file_name, _ = os.path.splitext(STIMULUS_NAME)
 
-    return os.listdir(COLLECTION_PATH+'/'+DATASET_NAME+'/SCANPATHS/'+file_name)
+    return os.listdir(
+        os.path.join(
+            COLLECTION_PATH,
+            DATASET_NAME,
+            'SCANPATHS',
+            file_name
+        )
+    )

@@ -10,16 +10,10 @@
 
 #########################################################################################
 
-import os
-COLLECTION_PATH = os.path.dirname(os.path.abspath(__file__)) + '/FixaTons'
-
-#########################################################################################
-
 # IMPORT EXTERNAL LIBRARIES
 
 import cv2
 import numpy as np
-
 import _get_data_functions as get
 
 #########################################################################################
@@ -79,8 +73,6 @@ def map(DATASET_NAME, STIMULUS_NAME,
 
     cv2.destroyAllWindows()
 
-    return
-
 #########################################################################################
 
 def scanpath(DATASET_NAME, STIMULUS_NAME, subject = 0, 
@@ -126,13 +118,14 @@ def scanpath(DATASET_NAME, STIMULUS_NAME, subject = 0,
         if putLines and i>0:
             prec_fixation = scanpath[i-1].astype(int)
             cv2.line(frame, 
-						(prec_fixation[0], prec_fixation[1]), (fixation[0], fixation[1]), 
-						(0, 0, 255), thickness = 1, lineType = 8, shift = 0)
+                    (prec_fixation[0], prec_fixation[1]), (fixation[0], fixation[1]),
+                    (0, 0, 255), thickness = 1, lineType = 8, shift = 0)
 
         # if animation is required, frames are attached in a sequence
         # if not animation is required, older frames are removed
         toPlot.append(frame)
-        if not animation: toPlot.pop(0)
+        if not animation:
+            toPlot.pop(0)
 
     # if required, resize the frames
     if plotMaxDim:
@@ -165,7 +158,3 @@ def scanpath(DATASET_NAME, STIMULUS_NAME, subject = 0,
     cv2.waitKey(wait_time)
 
     cv2.destroyAllWindows()
-
-
-
-    return

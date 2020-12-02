@@ -120,6 +120,105 @@ def AUC_Judd(saliencyMap, fixationMap, jitter=True, toPlot=False):
 
 ######################################################################################
 
+def AUC_shuffled(saliencyMap, fixationMap, otherMap, Nsplits, stepSize=0.1, toPlot=False):
+    '''saliencyMap is the saliency map
+    fixationMap is the human fixation map (binary matrix)
+    otherMap is a binary fixation map (like fixationMap) by taking the union of
+    fixations from M other random images (Borji uses M=10)
+    Nsplits is number of random splits
+    stepSize is for sweeping through saliency map
+    if toPlot=1, displays ROC curve
+    '''
+
+    # If there are no fixations to predict, return NaN
+    if not fixationMap.any():
+        print('Error: no fixationMap')
+        score = float('nan')
+        return score
+
+    if not np.shape(saliencyMap) == np.shape(fixationMap):
+        saliencyMap = np.array(Image.fromarray(saliencyMap).resize((np.shape(fixationMap)[1], np.shape(fixationMap)[0])))
+
+    # normalize saliency map
+    saliencyMap = (saliencyMap - saliencyMap.min()) \
+                  / (saliencyMap.max() - saliencyMap.min())
+
+    if np.isnan(saliencyMap).all():
+        print('NaN saliencyMap')
+        score = float('nan')
+        return score
+
+    S = saliencyMap.flatten()
+    F = fixationMap.flatten()
+    Oth = otherMap.flatten()
+
+    Sth = S[F > 0]  # sal map values at fixation locations
+    Nfixations = len(Sth)
+    Npixels = len(S)
+
+    # for each fixation, sample Nsplits values from the sal map at locations specified by otherMap
+    ind = np.nonzero(Oth)[0] # find fixation locations on other images
+
+    Nfixations_oth = min(Nfixations, len(ind))
+    randfix = np.empty((Nfixations_oth,Nsplits))
+    randfix[:] = np.nan
+
+    for i in range(Nsplits):
+        randind = ind[np.random.permutation(len(ind))]  # randomize choice of fixation locations
+        randfix[:, i] = S[randind[:Nfixations_oth]] # sal map values at random fixation locations of other random images
+
+    # calculate AUC per random split (set of random locations)
+    auc = np.empty(Nsplits)
+    auc[:] = np.nan
+
+    def Matlab_like_gen(start, stop, step, precision):
+        r = start
+        while round(r, precision) <= stop:
+            yield round(r, precision)
+            r += step
+
+    for s in range(Nsplits):
+        curfix = randfix[:, s]
+        i0 = Matlab_like_gen(0, min(np.maximum(Sth, curfix)), stepSize, 5)
+        allthreshes = [x for x in i0]
+        allthreshes.reverse()
+
+        tp = np.zeros((len(allthreshes) + 2))
+        fp = np.zeros((len(allthreshes) + 2))
+        tp[0], tp[-1] = 0, 1
+        fp[0], fp[-1] = 0, 1
+
+        for i in range(len(allthreshes)):
+            thresh = allthreshes[i]
+            tp[i+1] = (Sth >= thresh).sum() / Nfixations
+            fp[i+1] = (curfix >= thresh).sum() / Nfixations_oth
+
+        auc[s] = np.trapz(tp, x=fp)
+
+    score = np.mean(auc)  # mean across random splits
+
+    if toPlot:
+        import matplotlib.pyplot as plt
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 2, 1)
+        ax.matshow(saliencyMap, cmap='gray')
+        ax.set_title('SaliencyMap with fixations to be predicted')
+        [y, x] = np.nonzero(fixationMap)
+        s = np.shape(saliencyMap)
+        plt.axis((-.5, s[1] - .5, s[0] - .5, -.5))
+        plt.plot(x, y, 'ro')
+
+        ax = fig.add_subplot(1, 2, 2)
+        plt.plot(fp, tp, '.b-')
+        ax.set_title('Area under ROC curve: ' + str(score))
+        plt.axis((0, 1, 0, 1))
+        plt.show()
+
+    return score
+
+
+######################################################################################
+
 ''' created: Zoya Bylinskii, Aug 2014
     python-version by: Dario Zanca, Jan 2017
 
@@ -185,6 +284,42 @@ def NSS(saliencyMap, fixationMap):
 
     # mean value at fixation locations
     score = map1[fixationMap.astype(bool)].mean()
+
+    return score
+
+
+######################################################################################
+
+'''created: Zoya Bylinskii, March 6
+based on: Kummerer et al.
+(http://www.pnas.org/content/112/52/16054.abstract)
+Python Implementation: Lapo Faggi, Oct 2020
+
+This finds the information-gain of the saliencyMap over a baselineMap'''
+
+
+def InfoGain(saliencyMap, fixationMap, baselineMap):
+    '''saliencyMap is the saliency map
+    fixationMap is the human fixation map (binary matrix)
+    baselineMap is another saliency map (e.g. all fixations from other images)'''
+
+    map1 = np.resize(saliencyMap,np.shape(fixationMap))
+    mapb = np.resize(baselineMap, np.shape(fixationMap))
+
+    # normalize and vectorize saliency maps
+    map1 = (map1.flatten(order='F') - np.min(map1))/ (np.max(map1 - np.min(map1)))
+    mapb = (mapb.flatten(order='F') - np.min(mapb))/(np.max(mapb - np.min(mapb)))
+
+    # turn into distributions
+    map1 /= np.sum(map1)
+    mapb /= np.sum(mapb)
+
+    fixationMap = fixationMap.flatten(order = 'F')
+    locs = []
+    locs = fixationMap > 0
+
+    eps = 10 ** -12
+    score = np.mean(np.log2(eps+map1[locs]-np.log2(eps+mapb[locs])))
 
     return score
 

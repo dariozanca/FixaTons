@@ -50,8 +50,20 @@ ________________________________________________________________________________
             
 ________________________________________________________________________________
 
-## How to use FixaTons (with python)
+## Implemented metrics for saliency maps and scanpaths evaluation
 
+- Metrics for saliency prediction task:
+	- AUC_Judd (Area Under the ROC Curve, Judd version)
+	- AUC_shuffled
+	- KLdiv 
+	- NSS (Normalized Scanpath Saliency)
+	- InfoGain
+- Metrics for scanpaths prediction task:
+	- euclidean_distance
+	- string_edit_distance
+	- scaled_time_delay_embedding_distance
+
+## How to use FixaTons (with python)
 
 For an easy use of the dataset, python software is provided. This tools help you in different tasks:
 
@@ -62,4 +74,3 @@ For an easy use of the dataset, python software is provided. This tools help you
     - Compute statistics
 
 For some example codes, please refer to the correspondent report or Tutorial.ipynb (jupiter notebook) https://github.com/dariozanca/FixaTons/blob/master/Tutorial.ipynb.
-

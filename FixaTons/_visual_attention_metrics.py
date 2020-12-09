@@ -130,9 +130,9 @@ def AUC_shuffled(saliencyMap, fixationMap, otherMap, Nsplits, stepSize=0.1, toPl
     if toPlot=1, displays ROC curve
     '''
 
-    saliencyMap = saliencyMap.transpose()
-    fixationMap = fixationMap.transpose()
-    otherMap = otherMap.transpose()
+    # saliencyMap = saliencyMap.transpose()
+    # fixationMap = fixationMap.transpose()
+    # otherMap = otherMap.transpose()
 
     # If there are no fixations to predict, return NaN
     if not fixationMap.any():
@@ -152,9 +152,9 @@ def AUC_shuffled(saliencyMap, fixationMap, otherMap, Nsplits, stepSize=0.1, toPl
     saliencyMap = (saliencyMap - saliencyMap.min()) \
                   / (saliencyMap.max() - saliencyMap.min())
 
-    S = saliencyMap.flatten()
-    F = fixationMap.flatten()
-    Oth = otherMap.flatten()
+    S = saliencyMap.flatten(order='F')
+    F = fixationMap.flatten(order='F')
+    Oth = otherMap.flatten(order='F')
 
     Sth = S[F > 0]  # sal map values at fixation locations
     Nfixations = len(Sth)
@@ -318,11 +318,10 @@ def InfoGain(saliencyMap, fixationMap, baselineMap):
     mapb /= np.sum(mapb)
 
     fixationMap = fixationMap.flatten(order = 'F')
-    locs = []
     locs = fixationMap > 0
 
-    eps = 10 ** -12
-    score = np.mean(np.log2(eps+map1[locs]-np.log2(eps+mapb[locs])))
+    eps = 2.2204e-16
+    score = np.mean(np.log2(eps+map1[locs])-np.log2(eps+mapb[locs]))
 
     return score
 

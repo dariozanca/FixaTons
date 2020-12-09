@@ -130,6 +130,10 @@ def AUC_shuffled(saliencyMap, fixationMap, otherMap, Nsplits, stepSize=0.1, toPl
     if toPlot=1, displays ROC curve
     '''
 
+    saliencyMap = saliencyMap.transpose()
+    fixationMap = fixationMap.transpose()
+    otherMap = otherMap.transpose()
+
     # If there are no fixations to predict, return NaN
     if not fixationMap.any():
         print('Error: no fixationMap')
@@ -139,14 +143,14 @@ def AUC_shuffled(saliencyMap, fixationMap, otherMap, Nsplits, stepSize=0.1, toPl
     if not np.shape(saliencyMap) == np.shape(fixationMap):
         saliencyMap = np.array(Image.fromarray(saliencyMap).resize((np.shape(fixationMap)[1], np.shape(fixationMap)[0])))
 
-    # normalize saliency map
-    saliencyMap = (saliencyMap - saliencyMap.min()) \
-                  / (saliencyMap.max() - saliencyMap.min())
-
     if np.isnan(saliencyMap).all():
         print('NaN saliencyMap')
         score = float('nan')
         return score
+
+    # normalize saliency map
+    saliencyMap = (saliencyMap - saliencyMap.min()) \
+                  / (saliencyMap.max() - saliencyMap.min())
 
     S = saliencyMap.flatten()
     F = fixationMap.flatten()
@@ -154,7 +158,6 @@ def AUC_shuffled(saliencyMap, fixationMap, otherMap, Nsplits, stepSize=0.1, toPl
 
     Sth = S[F > 0]  # sal map values at fixation locations
     Nfixations = len(Sth)
-    Npixels = len(S)
 
     # for each fixation, sample Nsplits values from the sal map at locations specified by otherMap
     ind = np.nonzero(Oth)[0] # find fixation locations on other images
@@ -179,7 +182,7 @@ def AUC_shuffled(saliencyMap, fixationMap, otherMap, Nsplits, stepSize=0.1, toPl
 
     for s in range(Nsplits):
         curfix = randfix[:, s]
-        i0 = Matlab_like_gen(0, min(np.maximum(Sth, curfix)), stepSize, 5)
+        i0 = Matlab_like_gen(0, max(np.maximum(Sth, curfix)), stepSize, 5)
         allthreshes = [x for x in i0]
         allthreshes.reverse()
 

@@ -37,7 +37,7 @@ ________________________________________________________________________________
                   scanpaths are matrices
                   rows of this matrices describe fixations
                   each fixation is of the form :
-                  [x-pixel, y-pixel, initial time, final time]
+                  [x-pixel, inverted-y-pixel, initial time, final time]
                   Times are in seconds.
 
         - FIXATION_MAPS : contains a fixation map of each original image

@@ -62,6 +62,7 @@ ________________________________________________________________________________
 	- euclidean_distance
 	- string_edit_distance
 	- scaled_time_delay_embedding_distance
+	- string-based time-delay embeddings
 
 ## How to use FixaTons (with python)
 

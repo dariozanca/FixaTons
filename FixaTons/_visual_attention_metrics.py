@@ -8,6 +8,10 @@ Created on 1 mar 2017
                     - KL Kullback Leiber divergence
                     - NSS Normalized Scanpath Similarity
                 - scanpaths similarity
+                    - Euclidean distance
+                    - String-edit distance
+                    - Scaled time-delay embeddings
+                    - String-based time-delay embeddings
 '''
 
 #########################################################################################
@@ -17,6 +21,7 @@ Created on 1 mar 2017
 import numpy as np
 from copy import copy
 import matplotlib.pyplot as plt
+from nltk.metrics import edit_distance
 
 #########################################################################################
 
@@ -368,87 +373,48 @@ def euclidean_distance(human_scanpath, simulated_scanpath):
     "speech and language processing", Jurafsky, Martin. Cap. 3, par. 11. '''
 
 
-def _Levenshtein_Dmatrix_initializer(len1, len2):
-    Dmatrix = []
 
-    for i in range(len1):
-        Dmatrix.append([0] * len2)
-
-    for i in range(len1):
-        Dmatrix[i][0] = i
-
-    for j in range(len2):
-        Dmatrix[0][j] = j
-
-    return Dmatrix
-
-
-def _Levenshtein_cost_step(Dmatrix, string_1, string_2, i, j, substitution_cost=1):
-    char_1 = string_1[i - 1]
-    char_2 = string_2[j - 1]
-
-    # insertion
-    insertion = Dmatrix[i - 1][j] + 1
-    # deletion
-    deletion = Dmatrix[i][j - 1] + 1
-    # substitution
-    substitution = Dmatrix[i - 1][j - 1] + substitution_cost * (char_1 != char_2)
-
-    # pick the cheapest
-    Dmatrix[i][j] = min(insertion, deletion, substitution)
-
-
-def _Levenshtein(string_1, string_2, substitution_cost=1):
-    # get strings lengths and initialize Distances-matrix
-    len1 = len(string_1)
-    len2 = len(string_2)
-    Dmatrix = _Levenshtein_Dmatrix_initializer(len1 + 1, len2 + 1)
-
-    # compute cost for each step in dynamic programming
-    for i in range(len1):
-        for j in range(len2):
-            _Levenshtein_cost_step(Dmatrix,
-                               string_1, string_2,
-                               i + 1, j + 1,
-                               substitution_cost=substitution_cost)
-
-    if substitution_cost == 1:
-        max_dist = max(len1, len2)
-    elif substitution_cost == 2:
-        max_dist = len1 + len2
-
-    return Dmatrix[len1][len2]
-
-def _scanpath_to_string(scanpath, height, width, n):
-
-    height_step, width_step = height//n, width//n
+def scanpath_to_string(
+        scanpath,
+        stimulus_width,
+        stimulus_height,
+        grid_size
+):
+    width_step = stimulus_width // grid_size
+    height_step = stimulus_height // grid_size
 
     string = ''
 
     for i in range(np.shape(scanpath)[0]):
         fixation = scanpath[i].astype(np.int32)
-        correspondent_square = (fixation[0] / width_step) + (fixation[1] / height_step) * n
-        string += chr(97+correspondent_square)
+        correspondent_square = (fixation[0] // width_step) + (fixation[1] // height_step) * grid_size
+        string += chr(97 + int(correspondent_square))
 
     return string
 
+def string_edit_distance(
+        scanpath_1,
+        scanpath_2,
+        stimulus_width,
+        stimulus_height,
+        grid_size=4
+):
 
-def string_edit_distance(stimulus, # matrix
+    string_1 = scanpath_to_string(
+        scanpath_1,
+        stimulus_width,
+        stimulus_height,
+        grid_size
+    )
+    string_2 = scanpath_to_string(
+        scanpath_2,
+        stimulus_width,
+        stimulus_height,
+        grid_size
+    )
 
-                         human_scanpath, simulated_scanpath,
+    return edit_distance(string_1, string_2, transpositions=True), string_1, string_2
 
-                         n = 5, # divide stimulus in a nxn grid
-                         substitution_cost=1
-                         ):
-
-    height, width = np.shape(stimulus)[0:2]
-
-    string_1 = _scanpath_to_string(human_scanpath, height, width, n)
-    string_2 = _scanpath_to_string(simulated_scanpath, height, width, n)
-
-    print(string_1, string_2)
-
-    return _Levenshtein(string_1, string_2)
 
 
 #########################################################################################
@@ -566,3 +532,76 @@ def scaled_time_delay_embedding_distance(
         plt.show()
 
     return sum(similarities) / len(similarities)
+
+
+
+
+#########################################################################################
+
+''' created: Dario Zanca, April 2022
+
+    First, we converst scanpaths to strings. Then, we compute a distance with  time-delay 
+    embeddings in the string domain. '''
+
+
+def string_based_time_delay_embedding_distance(
+        scanpath_1,
+        scanpath_2,
+
+        stimulus_width,
+        stimulus_height,
+
+        # options
+        k=3,  # time-embedding vector dimension
+        distance_mode='Mean'
+        ):
+    # human_scanpath and simulated_scanpath can have different lenghts
+    # They are list of fixations, that is couple of coordinates
+    # k must be shorter than both lists lenghts
+
+    # we check for k be smaller or equal then the lenghts of the two input scanpaths
+    if len(scanpath_1) < k or len(scanpath_2) < k:
+        print('ERROR: Too large value for the time-embedding vector dimension')
+        return False
+
+    # create time-embedding vectors for both scanpaths
+
+    scanpath_1_vectors = []
+    for i in np.arange(0, len(scanpath_1) - k + 1):
+        scanpath_1_vectors.append(scanpath_1[i:i + k])
+
+    scanpath_2_vectors = []
+    for i in np.arange(0, len(scanpath_2) - k + 1):
+        scanpath_2_vectors.append(scanpath_2[i:i + k])
+
+    # in the following cicles, for each k-vector from the simulated scanpath
+    # we look for the k-vector from humans, the one of minumum distance
+    # and we save the value of such a distance, divided by k
+
+    distances = []
+
+    for s2_k_vec in scanpath_2_vectors:
+
+        # find human k-vec of minimum distance
+
+        norms = []
+
+        for s1_k_vec in scanpath_1_vectors:
+
+            d, _, _ = string_edit_distance(s1_k_vec, s2_k_vec, stimulus_width=stimulus_width, stimulus_height=stimulus_height)
+            norms.append(d)
+
+        distances.append(min(norms) / k)
+
+    # at this point, the list "distances" contains the value of
+    # minumum distance for each simulated k-vec
+    # according to the distance_mode, here we compute the similarity
+    # between the two scanpaths.
+
+    if distance_mode == 'Mean':
+        return sum(distances) / len(distances)
+    elif distance_mode == 'Hausdorff':
+        return max(distances)
+    else:
+        print('ERROR: distance mode not defined.')
+        return False

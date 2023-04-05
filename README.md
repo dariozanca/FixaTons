@@ -63,6 +63,10 @@ ________________________________________________________________________________
 	- string_edit_distance
 	- scaled_time_delay_embedding_distance
 	- string-based time-delay embeddings
+    - Recurrence Quantification Analysis (RQA)
+    - ScanMatch
+    - MultiMatch
+
 
 ## How to use FixaTons (with python)
 

@@ -14,13 +14,13 @@ import os
 
 COLLECTION_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    'FixaTons'
+    'Datasets'
 )
 
-COLLECTION_PATH = os.path.join(
+'''COLLECTION_PATH = os.path.join(
     'E:\DATASETS\FixaTons',
     'FixaTons'
-)
+)'''
 
 '''
 This file includes tools to an easy use of the collection of datasets. 
@@ -34,6 +34,9 @@ This tools help you in different tasks:
 #########################################################################################
 
 # IMPORT EXTERNAL LIBRARIES
+
+import sys
+sys.path.insert(1, 'FixaTons/')
 
 import os
 import cv2

@@ -605,3 +605,105 @@ def string_based_time_delay_embedding_distance(
     else:
         print('ERROR: distance mode not defined.')
         return False
+
+
+#########################################################################################
+
+''' Implementation of recurrence quantification analysis (RQA) to quantify the similarity of two fixation sequences (or scanpaths).
+    Based on the paper Anderson, Nicola C., et al. "A comparison of scanpath comparison methods." Behavior research methods 47.4 (2015): 1377-1392.
+    It implements the following metrics:
+
+    Determinism
+    Laminarity
+    Center of recurrence mass
+    Cross-recurrence'''
+
+
+from _rqa import RQA
+
+def compute_rqa_metrics(scanpath_1, scanpath_2, r=60, ll=2):
+    '''Parameters:
+        scanpath_1            (n,2) matrix of x,y fixations
+        scanpath_2            (n,2) matrix of x,y fixations
+        r                     e.g. 60, radius threshold
+        ll                    e.g. 2, minimum line length
+        
+        Returns:    
+        det                   Determinism
+        lam                   Laminarity
+        corm                  Center of recurrence mass
+        crossrec              Cross-recurrence'''
+
+    if scanpath_1.shape[1] > 2:
+        scanpath1 = scanpath_1[:,:2]
+    if scanpath_2.shape[1] > 2:
+        scanpath2 = scanpath_2[:,:2]
+
+    rqaObj = RQA(scanpath_1, scanpath_2)
+    
+    determinism = rqaObj.determinism()
+    laminarity = rqaObj.laminarity()
+    corm = rqaObj.centerrecmass()
+    crossrec = rqaObj.crossrec()
+
+    return determinism, laminarity, corm, crossrec 
+
+
+
+#########################################################################################
+
+''' ScanMatch. Evaluating simirality between two fixation sequences with ScanMatch algorithm,
+    proposed by Cristino, Mathot, Theeuwes and Gilchrist (2010). 
+    Builds upon the GazeParser python package (https://pypi.org/project/GazeParser/)'''
+
+from _scanMatch import ScanMatch
+
+
+def scanMatch_metric(s1, s2, stimulus_width, stimulus_height, Xbin=14, Ybin=8, TempBin=50):
+
+    if s1.shape[1] > 2 and s2.shape[1] > 2:
+        tb = TempBin
+        diff1 = (s1[:,3] - s1[:,2]) * 1000.
+        s1 = np.hstack([s1[:,0].reshape(-1,1), s1[:,1].reshape(-1,1), diff1.reshape(-1,1)])
+        diff2 = (s2[:,3] - s2[:,2]) * 1000.
+        s2 = np.hstack([s2[:,0].reshape(-1,1), s2[:,1].reshape(-1,1), diff2.reshape(-1,1)])
+
+    elif s1.shape[1] == 2 and s2.shape[1] == 2:
+        tb = 0.0
+    else:
+        raise ValueError("Scanpaths should be arrays of shape [nfix,2] or [nfix,4]! Columns are assumed to be x,y fixations coordinates and, eventually, their start and end times (seconds)")
+    
+    matchObject = ScanMatch(Xres=stimulus_width, Yres=stimulus_height, Xbin=Xbin, Ybin=Ybin, TempBin=TempBin)
+    seq1 = matchObject.fixationToSequence(s1).astype(int)
+    seq2 = matchObject.fixationToSequence(s2).astype(int)
+
+    (score, _, _) = matchObject.match(seq1, seq2)
+
+    return score
+
+
+
+#########################################################################################
+
+''' MultiMatch. The MultiMatch method is a vector-based, multi-dimensional approach to compute scan path similarity. 
+    It was originally proposed by Jarodzka, Holmqvist & Nyström (2010) and originally implemented as a Matlab toolbox by Dewhursts and colleagues (2012).
+    Requires the multimatch-gaze python package (https://multimatch.readthedocs.io/en/latest/index.html)'''
+
+import multimatch_gaze as mmg
+import pandas as pd
+
+def multiMatch_metric(s1, s2, stimulus_width, stimulus_height):
+
+    assert s1.shape[1] > 2 and s2.shape[1] > 2, "Scanpaths should be arrays of shape [nfix,4] to compute MultiMatch! Columns are assumed to be x,y fixations coordinates and their their start and end times (seconds), resepectively"
+    
+    diff1 = (s1[:,3] - s1[:,2]) * 1000.
+    ss1 = np.hstack([s1[:,0].reshape(-1,1), s1[:,1].reshape(-1,1), diff1.reshape(-1,1)])
+    diff2 = (s2[:,3] - s2[:,2]) * 1000.
+    ss2 = np.hstack([s2[:,0].reshape(-1,1), s2[:,1].reshape(-1,1), diff2.reshape(-1,1)])
+
+    scan1_pd = pd.DataFrame({'start_x': ss1[:,0], 'start_y': ss1[:,1], 'duration': ss1[:,2]})
+    scan2_pd = pd.DataFrame({'start_x': ss2[:,0], 'start_y': ss2[:,1], 'duration': ss2[:,2]})
+    
+    mm_scores = mmg.docomparison(scan1_pd.to_records(), scan2_pd.to_records(), screensize=[stimulus_width, stimulus_height])
+
+    return mm_scores

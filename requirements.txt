@@ -1,0 +1,4 @@
+nltk
+multimatch
+pandas
+numpy

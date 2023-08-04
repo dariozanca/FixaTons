@@ -1,5 +1,5 @@
 # FixaTons
-A collection of Human FixationsDatasets and Metrics for Scanpath Similarity
+A collection of Human Fixations Datasets and Metrics for Scanpath Similarity
 
 ## Citations
 If you intend to use this collection of datasets on your research, please cite the technical report
